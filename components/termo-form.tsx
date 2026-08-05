@@ -142,16 +142,16 @@ export function TermoForm() {
     return true
   }
 
-  function handleDownload() {
+  async function handleDownload() {
     if (!validate()) return
-    const doc = generateTermoPdf(buildData())
+    const doc = await generateTermoPdf(buildData())
     const fileName = `termo-${equipmentType?.id ?? "equipamento"}-${slugify(nome) || "colaborador"}.pdf`
     doc.save(fileName)
   }
 
-  function handlePreview() {
+  async function handlePreview() {
     if (!validate()) return
-    const doc = generateTermoPdf(buildData())
+    const doc = await generateTermoPdf(buildData())
     const url = doc.output("bloburl")
     window.open(url, "_blank")
   }

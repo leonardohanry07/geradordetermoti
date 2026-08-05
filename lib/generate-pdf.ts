@@ -1,6 +1,19 @@
 import { jsPDF } from "jspdf"
 import { getTermoRecebimento, getTermoResponsabilidade, type Block, type TermoData } from "./termos"
 
+// Carrega a imagem da pasta /public e converte para base64 em tempo de execução.
+// Evita colar strings base64 gigantes manualmente (fonte comum de erro "wrong PNG signature").
+async function loadLogoBase64(): Promise<string> {
+  const res = await fetch("/logo.png")
+  const blob = await res.blob()
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+}
+
 // Medidas em mm (A4)
 const PAGE_W = 210
 const PAGE_H = 297
@@ -9,6 +22,10 @@ const MARGIN_TOP = 22
 const MARGIN_BOTTOM = 24
 const CONTENT_W = PAGE_W - MARGIN_X * 2
 const LINE_H = 6
+
+// Dimensões do logo (proporção real da imagem: 180x105px ≈ 1.71:1)
+const LOGO_W = 35 // largura em mm
+const LOGO_H = 20.4 // altura em mm
 
 class PdfWriter {
   doc: jsPDF
@@ -24,6 +41,13 @@ class PdfWriter {
       this.doc.addPage()
       this.y = MARGIN_TOP
     }
+  }
+
+  addLogo(base64: string, width = LOGO_W, height = LOGO_H) {
+    // Alinhado no canto superior esquerdo, respeitando a margem da página.
+    const x = MARGIN_X
+    this.doc.addImage(base64, "PNG", x, this.y, width, height)
+    this.y += height + 6 // espaço depois do logo antes do texto começar
   }
 
   private writeLines(text: string, fontSize: number, style: "normal" | "bold", indent = 0) {
@@ -134,8 +158,12 @@ class PdfWriter {
   }
 }
 
-export function generateTermoPdf(data: TermoData): jsPDF {
+export async function generateTermoPdf(data: TermoData): Promise<jsPDF> {
   const w = new PdfWriter()
+
+  // Logo aparece só aqui, no topo da primeira página
+  const logoBase64 = await loadLogoBase64()
+  w.addLogo(logoBase64)
 
   // Documento 1 - Termo de Responsabilidade
   for (const block of getTermoResponsabilidade(data)) {
