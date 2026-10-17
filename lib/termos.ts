@@ -21,6 +21,10 @@ export type TermoData = {
     acessorios: string
   }
   supervisor: string
+  // Cláusulas extras, adicionadas pelo usuário no formulário.
+  // Entram automaticamente numeradas em sequência às cláusulas fixas (9, 10, 11...),
+  // sempre no final do Termo de Responsabilidade, antes da declaração de aceite.
+  clausulasAdicionais?: { titulo: string; texto: string }[]
 }
 
 // Blocos usados para renderizar o documento no PDF.
@@ -32,6 +36,10 @@ export type Block =
   | { type: "bullet"; text: string }
   | { type: "spacer"; size?: number }
 
+// Quantidade de cláusulas fixas no Termo de Responsabilidade (1 a 8 hoje).
+// Usado para numerar as cláusulas adicionais em sequência (9, 10, 11...).
+const TOTAL_CLAUSULAS_FIXAS = 8
+
 /**
  * TERMO DE RESPONSABILIDADE PARA UTILIZAÇÃO DE EQUIPAMENTOS DE T.I
  * Texto reproduzido PALAVRA POR PALAVRA do documento assinado fornecido pela empresa.
@@ -39,6 +47,22 @@ export type Block =
  */
 export function getTermoResponsabilidade(data: TermoData): Block[] {
   const { razaoSocial, cnpj } = data.company
+
+  // Monta os blocos das cláusulas adicionais (se houver), numeradas em sequência.
+  const blocksClausulasAdicionais: Block[] = []
+  const clausulasAdicionais = data.clausulasAdicionais?.filter(
+    (c) => c.titulo.trim() || c.texto.trim(),
+  )
+  if (clausulasAdicionais && clausulasAdicionais.length > 0) {
+    clausulasAdicionais.forEach((clausula, index) => {
+      const numero = TOTAL_CLAUSULAS_FIXAS + index + 1
+      const titulo = clausula.titulo.trim() || "CLÁUSULA ADICIONAL"
+      blocksClausulasAdicionais.push({ type: "spacer", size: 2 })
+      blocksClausulasAdicionais.push({ type: "heading", text: `${numero}. ${titulo.toUpperCase()}` })
+      blocksClausulasAdicionais.push({ type: "paragraph", text: clausula.texto.trim() })
+    })
+  }
+
   return [
     { type: "title", text: "TERMO DE RESPONSABILIDADE PARA UTILIZAÇÃO DE EQUIPAMENTOS DE T.I" },
     { type: "spacer", size: 4 },
@@ -119,6 +143,8 @@ export function getTermoResponsabilidade(data: TermoData): Block[] {
       type: "paragraph",
       text: "Este termo tem validade enquanto o usuário estiver em posse do equipamento, podendo ser revogado a qualquer momento pela administração da academia.",
     },
+    // Cláusulas adicionais (se houver) entram aqui, sempre depois da última cláusula fixa.
+    ...blocksClausulasAdicionais,
     { type: "spacer", size: 6 },
     { type: "paragraph", text: "Declaro que li e concordo com os termos acima." },
     { type: "spacer", size: 2 },

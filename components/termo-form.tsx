@@ -8,6 +8,9 @@ import {
   FileText,
   Laptop,
   Pencil,
+  Plus,
+  ScrollText,
+  Trash2,
   User,
 } from "lucide-react"
 import { DEFAULT_COMPANY, EQUIPMENT_TYPES, getEquipmentType } from "@/lib/equipment-config"
@@ -115,7 +118,25 @@ export function TermoForm() {
   const [supervisor, setSupervisor] = useState("")
   const [error, setError] = useState("")
 
+  // Cláusulas adicionais: entram automaticamente numeradas (9, 10, 11...) no final
+  // do Termo de Responsabilidade, sempre depois das cláusulas fixas (1 a 8).
+  const [clausulas, setClausulas] = useState<{ titulo: string; texto: string }[]>([])
+
   const equipmentType = useMemo(() => getEquipmentType(tipo), [tipo])
+
+  function addClausula() {
+    setClausulas((prev) => [...prev, { titulo: "", texto: "" }])
+  }
+
+  function updateClausula(index: number, field: "titulo" | "texto", value: string) {
+    setClausulas((prev) =>
+      prev.map((c, i) => (i === index ? { ...c, [field]: value } : c)),
+    )
+  }
+
+  function removeClausula(index: number) {
+    setClausulas((prev) => prev.filter((_, i) => i !== index))
+  }
 
   function buildData(): TermoData {
     return {
@@ -129,6 +150,7 @@ export function TermoForm() {
         acessorios: acessorios.trim(),
       },
       supervisor: supervisor.trim(),
+      clausulasAdicionais: clausulas.filter((c) => c.titulo.trim() || c.texto.trim()),
     }
   }
 
@@ -339,6 +361,73 @@ export function TermoForm() {
             onChange={(e) => setSupervisor(e.target.value)}
           />
         </div>
+      </Section>
+
+      {/* Cláusulas adicionais */}
+      <Section
+        icon={<ScrollText className="size-5" />}
+        title="Cláusulas adicionais"
+        description="Aparecem no final do Termo de Responsabilidade, numeradas em sequência às cláusulas 1-8."
+        action={
+          <button
+            type="button"
+            onClick={addClausula}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+          >
+            <Plus className="size-3.5" />
+            Adicionar cláusula
+          </button>
+        }
+      >
+        {clausulas.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Nenhuma cláusula adicional. Use o botão acima se este colaborador precisar de alguma
+            condição extra (ex: equipamento restrito ao local de trabalho).
+          </p>
+        ) : (
+          <div className="grid gap-4">
+            {clausulas.map((clausula, index) => (
+              <div
+                key={index}
+                className="grid gap-3 rounded-lg border border-border bg-background p-4"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Cláusula {9 + index}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => removeClausula(index)}
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
+                  >
+                    <Trash2 className="size-3.5" />
+                    Remover
+                  </button>
+                </div>
+                <div>
+                  <Label htmlFor={`clausula-titulo-${index}`}>Título da cláusula</Label>
+                  <Input
+                    id={`clausula-titulo-${index}`}
+                    value={clausula.titulo}
+                    placeholder="Ex: Uso exclusivo no local de trabalho"
+                    onChange={(e) => updateClausula(index, "titulo", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`clausula-texto-${index}`}>Texto da cláusula</Label>
+                  <textarea
+                    id={`clausula-texto-${index}`}
+                    value={clausula.texto}
+                    placeholder="Ex: O equipamento deverá permanecer exclusivamente nas dependências da empresa, sendo vedado seu uso fora do ambiente de trabalho."
+                    onChange={(e) => updateClausula(index, "texto", e.target.value)}
+                    rows={3}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/30"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Section>
 
       {error ? (
