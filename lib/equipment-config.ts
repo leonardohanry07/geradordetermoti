@@ -55,7 +55,10 @@ export const EQUIPMENT_TYPES: EquipmentType[] = [
     nomeNoTermo: "monitor",
     specificField: { key: "serie", label: "Número de série", placeholder: "Ex: MON-2024-0001" },
   },
+  { id: "outros", label: "Outros", nomeNoTermo: "equipamento", specificField: { key: "identificacao", label: "Número de série / identificação" } },
 ]
+
+export const OUTROS_ID = "outros"
 
 export function getEquipmentType(id: string): EquipmentType | undefined {
   return EQUIPMENT_TYPES.find((e) => e.id === id)
