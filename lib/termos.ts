@@ -36,11 +36,16 @@ export function getTermoResponsabilidade(data: TermoData): Block[] {
     { type: "paragraph", text: `Pelo presente termo, o(a) abaixo-assinado(a) se compromete a utilizar os equipamentos de T.I fornecidos pela ${razaoSocial}, de acordo com as normas estabelecidas e reconhece a responsabilidade por qualquer dano causado por mal uso do equipamento.` },
     { type: "spacer", size: 2 }, { type: "field", label: "NOME DO COLABORADOR", value: data.colaborador.nome }, { type: "field", label: "CPF DO COLABORADOR", value: data.colaborador.cpf }, { type: "spacer", size: 2 },
   ]
-  data.clauses.forEach((clause, index) => {
+  const clauses = data.clauses.filter((clause) => {
     const title = clause.title.trim()
     const text = clause.text?.trim()
     const bullets = clause.bullets?.map((bullet) => bullet.trim()).filter(Boolean) ?? []
-    if (!title && !text && bullets.length === 0) return
+    return Boolean(title || text || bullets.length > 0)
+  })
+  clauses.forEach((clause, index) => {
+    const title = clause.title.trim()
+    const text = clause.text?.trim()
+    const bullets = clause.bullets?.map((bullet) => bullet.trim()).filter(Boolean) ?? []
     blocks.push({ type: "heading", text: `${index + 1}. ${title.toUpperCase()}` })
     if (text) blocks.push({ type: "paragraph", text: replaceCompany(text, razaoSocial) })
     bullets.forEach((bullet) => blocks.push({ type: "bullet", text: replaceCompany(bullet, razaoSocial) }))
