@@ -1,3 +1,4 @@
-import { AppHeader } from "@/components/app-header"
 import { Historico } from "@/components/historico"
-export default function Page(){return <><AppHeader/><main className="mx-auto max-w-6xl px-4 py-8"><h1 className="mb-2 text-2xl font-bold">Histórico</h1><p className="mb-6 text-muted-foreground">Consulte e baixe novamente os termos registrados.</p><Historico/></main></>}
+import { PageHeader } from "@/components/page-header"
+
+export default function Page() { return <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-8 md:py-8"><PageHeader title="Histórico" description="Consulte e baixe novamente os termos registrados." /><Historico /></div> }
