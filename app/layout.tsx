@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
+import { AppShell } from '@/components/app-shell'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({
@@ -22,7 +23,6 @@ export const metadata: Metadata = {
 
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
   themeColor: '#0a0708',
 }
 
@@ -32,9 +32,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className={`dark ${geistSans.variable} ${geistMono.variable} bg-background`}>
+    <html lang="pt-BR" className={`dark ${geistSans.variable} ${geistMono.variable} bg-background`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `try { var t = localStorage.getItem('termos-ti:theme:v1'); var theme = t === 'light' ? 'light' : 'dark'; document.documentElement.classList.remove('dark', 'light'); document.documentElement.classList.add(theme); document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#fafafa' : '#0a0708'); } catch (e) { document.documentElement.classList.remove('light'); document.documentElement.classList.add('dark'); }` }} />
+      </head>
       <body className="font-sans antialiased">
-        {children}
+        <AppShell>{children}</AppShell>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

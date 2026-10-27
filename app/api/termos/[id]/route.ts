@@ -1,0 +1,6 @@
+import { NextResponse } from "next/server"
+import { ensureSchema, sql } from "@/lib/db"
+export const runtime="nodejs"
+const json=(d:unknown,s=200)=>NextResponse.json(d,{status:s,headers:{"Cache-Control":"no-store"}})
+export async function GET(_:Request,{params}:{params:Promise<{id:string}>}){try{await ensureSchema();const {id}=await params;const [r]=await sql`SELECT id,created_at,nome,cpf,tipo,tipo_label,nome_outro,marca,modelo,specific_label,specific_value,acessorios,data_termo,unidade,termo FROM termos WHERE id=${id}`;if(!r)return json({error:"Termo não encontrado."},404);return json({id:r.id,createdAt:r.created_at.toISOString(),nome:r.nome,cpf:r.cpf,tipo:r.tipo,tipoLabel:r.tipo_label,nomeOutro:r.nome_outro,marca:r.marca,modelo:r.modelo,specificLabel:r.specific_label,specificValue:r.specific_value,acessorios:r.acessorios,dataTermo:r.data_termo,unidade:r.unidade,termo:r.termo})}catch(e){console.error(e);return json({error:"Não foi possível carregar o termo."},500)}}
+export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){try{await ensureSchema();const {id}=await params;await sql`DELETE FROM termos WHERE id=${id}`;return json({ok:true})}catch(e){console.error(e);return json({error:"Não foi possível excluir o termo."},500)}}

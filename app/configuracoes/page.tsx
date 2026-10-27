@@ -1,3 +1,4 @@
-import { AppHeader } from "@/components/app-header"
 import { Configuracoes } from "@/components/configuracoes"
-export default function Page(){return <><AppHeader/><main className="mx-auto max-w-4xl px-4 py-8"><h1 className="mb-2 text-2xl font-bold">Configurações</h1><p className="mb-6 text-muted-foreground">Gerencie assinaturas e cláusulas do termo.</p><Configuracoes/></main></>}
+import { PageHeader } from "@/components/page-header"
+
+export default function Page() { return <div className="mx-auto w-full max-w-4xl px-4 py-6 md:px-8 md:py-8"><PageHeader title="Configurações" description="Gerencie assinaturas e cláusulas do termo." /><Configuracoes /></div> }
