@@ -1,0 +1,7 @@
+import { NextResponse } from "next/server"
+import { ensureSchema, sql } from "@/lib/db"
+export const runtime="nodejs"
+const json=(d:unknown,s=200)=>NextResponse.json(d,{status:s,headers:{"Cache-Control":"no-store"}})
+function valid(v:any){return v&&Array.isArray(v.signers)&&v.signers.length<=20&&v.signers.length>0&&v.signers[0]?.kind==="usuario"&&v.signers.filter((x:any)=>x.kind==="usuario").length===1&&v.signers.every((x:any)=>typeof x.label==="string"&&x.label.length<=80)&&Array.isArray(v.clauses)&&v.clauses.length<=60&&v.clauses.every((x:any)=>typeof x.title==="string"&&x.title.length<=200&&(!x.text||x.text.length<=5000)&&(!x.bullets||Array.isArray(x.bullets)&&x.bullets.length<=30&&x.bullets.every((b:any)=>typeof b==="string"&&b.length<=1000)))}
+export async function GET(){try{await ensureSchema();const [r]=await sql`SELECT value FROM app_settings WHERE key='settings'`;return json(r?.value??null)}catch(e){console.error(e);return json({error:"Não foi possível carregar as configurações."},500)}}
+export async function PUT(req:Request){try{const value=await req.json();if(!valid(value))return json({error:"Configurações inválidas."},400);await ensureSchema();await sql`INSERT INTO app_settings (key,value,updated_at) VALUES ('settings',${JSON.stringify(value)},now()) ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value,updated_at=now()`;return json(value)}catch(e){console.error(e);return json({error:"Não foi possível salvar as configurações."},500)}}
