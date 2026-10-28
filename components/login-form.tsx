@@ -27,7 +27,7 @@ export function LoginForm() {
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <label className="grid gap-1.5 text-[14px] font-medium text-[#18345f]" htmlFor="email">
-        Endereço de correio electrónico
+        E-mail
         <span className="relative block">
           <Mail className="pointer-events-none absolute left-3 top-1/2 size-[19px] -translate-y-1/2 text-[#9aa8bc]" aria-hidden="true" />
           <input id="email" required type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="email@example.com" className="h-9 w-full rounded-md border border-[#cbd3df] bg-white pl-10 pr-3 text-sm text-[#172d50] shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none placeholder:text-[#7282a0] focus:border-[#f04444] focus:ring-2 focus:ring-[#f04444]/15" />
@@ -36,7 +36,7 @@ export function LoginForm() {
       <div className="grid gap-1.5">
         <div className="flex items-center justify-between gap-3">
           <label className="text-[14px] font-medium text-[#18345f]" htmlFor="password">Senha</label>
-          <Link href="/recuperar-senha" className="text-[14px] text-[#ff4848] underline-offset-2 hover:underline">Esqueceste-te da senha?</Link>
+          <Link href="/recuperar-senha" className="text-[14px] text-[#ff4848] underline-offset-2 hover:underline">Esqueceu a senha?</Link>
         </div>
         <span className="relative block">
           <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 size-[19px] -translate-y-1/2 text-[#9aa8bc]" aria-hidden="true" />
