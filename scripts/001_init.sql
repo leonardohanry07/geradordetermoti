@@ -1,0 +1,3 @@
+-- Schema aplicado no projeto Supabase via MCP: init_terms_auth_kanban.
+-- Mantido como referência idempotente do modelo de perfis, termos, eventos,
+-- configurações, trigger de usuários e políticas RLS.
