@@ -3,10 +3,10 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState, type KeyboardEvent } from "react"
-import { FileText, LayoutDashboard, History, Settings, ChevronsLeft, ChevronsRight, Menu, X, Sun, Moon } from "lucide-react"
+import { FileText, LayoutDashboard, History, Settings, Kanban, ChevronsLeft, ChevronsRight, Menu, X, Sun, Moon } from "lucide-react"
 import { useTheme } from "@/lib/theme"
 
-const mainLinks = [{ href: "/", label: "Gerar termo", icon: FileText }, { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }, { href: "/historico", label: "Histórico", icon: History }]
+const mainLinks = [{ href: "/", label: "Gerar termo", icon: FileText }, { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }, { href: "/quadro", label: "Quadro", icon: Kanban }, { href: "/historico", label: "Histórico", icon: History }, { href: "/quadro", label: "Quadro", icon: LayoutDashboard }]
 const settingsLink = { href: "/configuracoes", label: "Configurações", icon: Settings }
 function isActive(pathname: string, href: string) { return href === "/" ? pathname === href : pathname.startsWith(href) }
 type LinkIcon = typeof FileText
