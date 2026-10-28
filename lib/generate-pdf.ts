@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf"
 import { getTermoRecebimento, getTermoResponsabilidade, type Block, type TermoData } from "./termos"
+import { LOGO_GAVIOES_PNG } from "./logo-data"
 
 const PAGE_W = 210, PAGE_H = 297, MARGIN_X = 20, MARGIN_TOP = 22, MARGIN_BOTTOM = 24, CONTENT_W = PAGE_W - MARGIN_X * 2, LINE_H = 6
 
@@ -36,8 +37,9 @@ class PdfWriter {
     }
   }
   renderSingleSignature(nome: string) { this.ensureSpace(24); this.y += 12; this.doc.setDrawColor(60); this.doc.line(MARGIN_X, this.y, MARGIN_X + CONTENT_W * 0.6, this.y); this.y += 5; this.doc.setFont("helvetica", "normal"); this.doc.setFontSize(9); if (nome) this.doc.text(nome, MARGIN_X, this.y) }
+  addResponsibilityHeader() { this.doc.addImage(LOGO_GAVIOES_PNG, "PNG", 20, 22, 35, 20.4, undefined, "FAST"); this.y = 49 }
   addPage() { this.doc.addPage(); this.y = MARGIN_TOP }
 }
 
-export function generateTermoPdf(data: TermoData): jsPDF { const w = new PdfWriter(); for (const block of getTermoResponsabilidade(data)) w.renderBlock(block); w.renderSignatures(data.signers); w.addPage(); for (const block of getTermoRecebimento(data)) w.renderBlock(block); w.renderSingleSignature(data.colaborador.nome); return w.doc }
+export function generateTermoPdf(data: TermoData): jsPDF { const w = new PdfWriter(); w.addResponsibilityHeader(); for (const block of getTermoResponsabilidade(data)) w.renderBlock(block); w.renderSignatures(data.signers); w.addPage(); for (const block of getTermoRecebimento(data)) w.renderBlock(block); w.renderSingleSignature(data.colaborador.nome); return w.doc }
 export function slugify(text: string): string { return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase() }
