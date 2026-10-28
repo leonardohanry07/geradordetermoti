@@ -1,14 +1,11 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Barlow, Barlow_Condensed } from 'next/font/google'
 import './globals.css'
 import { AppShell } from '@/components/app-shell'
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
+const barlow = Barlow({ variable: '--font-barlow', subsets: ['latin'], weight: ['400','500','600'] })
+const barlowCondensed = Barlow_Condensed({ variable: '--font-barlow-condensed', subsets: ['latin'], weight: ['600','700'] })
 
 export const metadata: Metadata = {
   title: 'Gerador de Termos de Equipamento de T.I',
@@ -32,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className={`dark ${geistSans.variable} ${geistMono.variable} bg-background`} suppressHydrationWarning>
+    <html lang="pt-BR" className={`${barlow.variable} ${barlowCondensed.variable} bg-background`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: `try { var t = localStorage.getItem('termos-ti:theme:v1'); var theme = t === 'light' ? 'light' : 'dark'; document.documentElement.classList.remove('dark', 'light'); document.documentElement.classList.add(theme); document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#fafafa' : '#0a0708'); } catch (e) { document.documentElement.classList.remove('light'); document.documentElement.classList.add('dark'); }` }} />
       </head>
