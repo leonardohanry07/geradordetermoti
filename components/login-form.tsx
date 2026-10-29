@@ -49,6 +49,7 @@ export function LoginForm() {
       </label>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <button disabled={loading} className="mt-1 h-11 w-full rounded-md bg-[#f04444] text-[16px] font-semibold text-white shadow-sm transition-colors hover:bg-[#e83b3b] disabled:cursor-not-allowed disabled:opacity-60">{loading ? "A entrar..." : "Entrar"}</button>
+      <p className="text-center text-[14px] text-[#425b86]">Não tem conta? <Link href="/criar-conta" className="font-medium text-[#ec2027] underline-offset-2 hover:underline">Criar conta</Link></p>
     </form>
   )
 }
