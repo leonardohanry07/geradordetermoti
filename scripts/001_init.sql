@@ -1,7 +1,33 @@
-create extension if not exists pgcrypto;
-create table if not exists public.profiles(id uuid primary key references auth.users(id) on delete cascade,nome text,email text,role text not null default 'user' check(role in('admin','user')),ativo boolean not null default true,created_at timestamptz not null default now());
-create table if not exists public.termos(id uuid primary key default gen_random_uuid(),created_at timestamptz not null default now(),created_by uuid not null references auth.users(id),created_by_nome text not null default '',nome text not null,cpf text not null,tipo text not null,tipo_label text not null,nome_outro text not null default '',marca text not null default '',modelo text not null default '',specific_label text not null default '',specific_value text not null default '',acessorios text not null default '',data_termo text not null,unidade text not null default '',observacao text not null default '',status text not null default 'termo_gerado' check(status in('solicitado','termo_gerado','aguardando_assinatura','assinado','registrado')),status_changed_at timestamptz not null default now(),status_changed_by uuid references auth.users(id),termo jsonb);
-create table if not exists public.termo_eventos(id uuid primary key default gen_random_uuid(),termo_id uuid not null references public.termos(id) on delete cascade,de text not null,para text not null,por uuid references auth.users(id),por_nome text not null default '',em timestamptz not null default now());
-create table if not exists public.app_settings(key text primary key,value jsonb not null,updated_at timestamptz not null default now(),updated_by uuid references auth.users(id));
-create index if not exists termos_created_at_idx on public.termos(created_at desc);create index if not exists termos_status_idx on public.termos(status);create index if not exists termos_tipo_idx on public.termos(tipo_label);
-alter table public.profiles enable row level security;alter table public.termos enable row level security;alter table public.termo_eventos enable row level security;alter table public.app_settings enable row level security;
+-- DOCUMENTAÇÃO DO SCHEMA REAL DO SUPABASE
+-- Esta migração já foi aplicada externamente. NÃO executar nem recriar neste projeto.
+-- A fonte de verdade é o banco Supabase conectado.
+--
+-- Tabelas públicas aplicadas:
+--   profiles (id -> auth.users.id, nome, email, role admin|user, ativo, created_at)
+--   termos (termos de responsabilidade, status e payload jsonb)
+--   termo_eventos (histórico de transições de termos)
+--   app_settings (key/value jsonb)
+--   dominios_permitidos (domínios autorizados para cadastro público)
+--
+-- Segurança aplicada no Supabase:
+--   RLS nas tabelas públicas.
+--   funções is_admin() e is_active_member().
+--   triggers em auth.users para validar domínio, escolher o primeiro admin,
+--   criar profiles ativos e copiar raw_user_meta_data->>'nome'.
+--   Políticas de leitura/escrita administrativas e por membro ativo.
+--
+-- Colunas confirmadas no snapshot do banco:
+-- profiles: id uuid primary key references auth.users(id), nome text nullable,
+-- email text nullable, role text default 'user', ativo boolean default true,
+-- created_at timestamptz default now().
+-- termos: id uuid default gen_random_uuid(), created_at timestamptz default now(),
+-- created_by uuid, created_by_nome text default '', nome text, cpf text, tipo text,
+-- tipo_label text, nome_outro text default '', marca text default '', modelo text default '',
+-- specific_label text default '', specific_value text default '', acessorios text default '',
+-- data_termo text, unidade text default '', observacao text default '',
+-- status text default 'termo_gerado', status_changed_at timestamptz default now(),
+-- status_changed_by uuid nullable, termo jsonb nullable.
+-- termo_eventos: id uuid, termo_id uuid, de text, para text, por uuid nullable,
+-- por_nome text default '', em timestamptz default now().
+-- app_settings: key text primary key, value jsonb, updated_at timestamptz default now(),
+-- updated_by uuid nullable.
