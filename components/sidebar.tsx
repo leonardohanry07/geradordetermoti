@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState, type KeyboardEvent } from "react"
-import { FileText, LayoutDashboard, History, Settings, Kanban, ChevronsLeft, ChevronsRight, Menu, X, Sun, Moon } from "lucide-react"
+import { FileText, LayoutDashboard, History, Settings, Kanban, ChevronsLeft, ChevronsRight, Menu, X, Sun, Moon, LogOut } from "lucide-react"
 import { useTheme } from "@/lib/theme"
+import { createClient } from "@/lib/supabase/client"
 
 const mainLinks = [{ href: "/", label: "Gerar termo", icon: FileText }, { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }, { href: "/quadro", label: "Quadro", icon: Kanban }, { href: "/historico", label: "Histórico", icon: History }]
 const settingsLink = { href: "/configuracoes", label: "Configurações", icon: Settings }
@@ -16,8 +17,29 @@ function NavItem({ href, label, icon: Icon, collapsed, onNavigate }: { href: str
   return <li><Link href={href} onClick={onNavigate} aria-label={label} aria-current={active ? "page" : undefined} className={`group relative flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring motion-reduce:transition-none ${active ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"} ${collapsed ? "justify-center" : ""}`}><Icon className="size-5 shrink-0" aria-hidden="true" /><span className={collapsed ? "sr-only" : "transition-opacity duration-200 motion-reduce:transition-none"}>{label}</span>{collapsed && <span className="pointer-events-none absolute left-full top-1/2 z-20 ml-3 -translate-y-1/2 whitespace-nowrap rounded-md bg-sidebar-accent px-2.5 py-1.5 text-xs text-sidebar-accent-foreground opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">{label}</span>}</Link></li>
 }
 function ThemeButton({ collapsed, onClick, theme }: { collapsed?: boolean; onClick: () => void; theme: "light" | "dark" }) { return <button type="button" onClick={onClick} aria-label={theme === "dark" ? "Alternar para modo claro" : "Alternar para modo escuro"} className={`group relative flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring ${collapsed ? "justify-center" : ""}`}><Sun className="hidden size-5 shrink-0 dark:block" aria-hidden="true" /><Moon className="size-5 shrink-0 dark:hidden" aria-hidden="true" /><span aria-hidden="true" className={collapsed ? "sr-only" : "dark:hidden"}>Modo escuro</span><span aria-hidden="true" className={collapsed ? "sr-only" : "hidden dark:block"}>Modo claro</span>{collapsed && <span aria-hidden="true" className="pointer-events-none absolute left-full top-1/2 z-20 ml-3 -translate-y-1/2 whitespace-nowrap rounded-md bg-sidebar-accent px-2.5 py-1.5 text-xs text-sidebar-accent-foreground opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">Alternar tema</span>}</button> }
+function UserFooter({ collapsed }: { collapsed?: boolean }) {
+  const router = useRouter()
+  const [name, setName] = useState("")
+  const [busy, setBusy] = useState(false)
+  useEffect(() => {
+    let alive = true
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data }) => {
+      const user = data.user
+      if (!user) return
+      const { data: profile } = await supabase.from("profiles").select("nome").eq("id", user.id).maybeSingle()
+      if (alive) setName(profile?.nome || user.email || "")
+    })
+    return () => { alive = false }
+  }, [])
+  async function signOut() {
+    setBusy(true)
+    try { await createClient().auth.signOut() } finally { router.replace("/login"); router.refresh() }
+  }
+  return <li>{!collapsed && name && <p className="truncate px-3 pb-1 text-xs text-muted-foreground" title={name}>Conectado como <span className="font-medium text-sidebar-foreground">{name}</span></p>}<button type="button" onClick={signOut} disabled={busy} aria-label="Sair da conta" className={`group relative flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:opacity-60 ${collapsed ? "justify-center" : ""}`}><LogOut className="size-5 shrink-0" aria-hidden="true" /><span className={collapsed ? "sr-only" : ""}>{busy ? "Saindo..." : "Sair"}</span>{collapsed && <span aria-hidden="true" className="pointer-events-none absolute left-full top-1/2 z-20 ml-3 -translate-y-1/2 whitespace-nowrap rounded-md bg-sidebar-accent px-2.5 py-1.5 text-xs text-sidebar-accent-foreground opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">Sair</span>}</button></li>
+}
 function Logo({ size }: { size: "small" | "large" }) { return <span className={`flex shrink-0 items-center justify-center rounded-xl bg-white ring-1 ring-black/10 shadow-sm ${size === "large" ? "size-10 p-2" : "size-9 p-1.5"}`}><img src="/gavioes-logo.svg" alt="" width={40} height={40} className="size-full object-contain" draggable={false} /></span> }
-function SidebarContent({ collapsed, onNavigate, themeToggle, theme }: { collapsed?: boolean; onNavigate?: () => void; themeToggle: () => void; theme: "light" | "dark" }) { return <><div className="flex items-center gap-3"><Link href="/" onClick={onNavigate} aria-label="Página inicial" className="flex shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"><Logo size="large" /></Link>{!collapsed && <div className="min-w-0"><p className="font-semibold leading-tight">Termos de T.I</p><p className="text-xs text-muted-foreground">Equipamentos</p></div>}</div><nav aria-label="Navegação principal" className={collapsed ? "mt-14" : "mt-8"}><ul className="flex flex-col gap-2">{mainLinks.map((link) => <NavItem key={link.href} {...link} collapsed={collapsed} onNavigate={onNavigate} />)}</ul></nav><div className="mt-auto"><ul className="flex flex-col gap-2"><li><ThemeButton collapsed={collapsed} onClick={themeToggle} theme={theme} /></li><NavItem {...settingsLink} collapsed={collapsed} onNavigate={onNavigate} /></ul>{!collapsed && <p className="mt-4 px-3 text-xs leading-relaxed text-muted-foreground">Os registros ficam salvos no banco de dados. Exporte o CSV do Histórico para ter uma cópia.</p>}</div></> }
+function SidebarContent({ collapsed, onNavigate, themeToggle, theme }: { collapsed?: boolean; onNavigate?: () => void; themeToggle: () => void; theme: "light" | "dark" }) { return <><div className="flex items-center gap-3"><Link href="/" onClick={onNavigate} aria-label="Página inicial" className="flex shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"><Logo size="large" /></Link>{!collapsed && <div className="min-w-0"><p className="font-semibold leading-tight">Termos de T.I</p><p className="text-xs text-muted-foreground">Equipamentos</p></div>}</div><nav aria-label="Navegação principal" className={collapsed ? "mt-14" : "mt-8"}><ul className="flex flex-col gap-2">{mainLinks.map((link) => <NavItem key={link.href} {...link} collapsed={collapsed} onNavigate={onNavigate} />)}</ul></nav><div className="mt-auto"><ul className="flex flex-col gap-2"><li><ThemeButton collapsed={collapsed} onClick={themeToggle} theme={theme} /></li><NavItem {...settingsLink} collapsed={collapsed} onNavigate={onNavigate} /><UserFooter collapsed={collapsed} /></ul>{!collapsed && <p className="mt-4 px-3 text-xs leading-relaxed text-muted-foreground">Os registros ficam salvos no banco de dados. Exporte o CSV do Histórico para ter uma cópia.</p>}</div></> }
 export function Sidebar() {
   const pathname = usePathname(); const { theme, toggle } = useTheme(); const [collapsed, setCollapsed] = useState(false); const [mounted, setMounted] = useState(false); const [mobileOpen, setMobileOpen] = useState(false); const triggerRef = useRef<HTMLButtonElement>(null); const closeRef = useRef<HTMLButtonElement>(null); const dialogRef = useRef<HTMLElement>(null)
   useEffect(() => { try { setCollapsed(localStorage.getItem("termos-ti:sidebar:v1") === "collapsed") } catch {} setMounted(true) }, [])
