@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 
 export const viewport: Viewport = {
-  themeColor: '#0a0708',
+  themeColor: '#f8fafc',
 }
 
 export default function RootLayout({
@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${barlow.variable} ${barlowCondensed.variable} bg-background`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `try { var t = localStorage.getItem('termos-ti:theme:v1'); var theme = t === 'light' ? 'light' : 'dark'; document.documentElement.classList.remove('dark', 'light'); document.documentElement.classList.add(theme); document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#fafafa' : '#0a0708'); } catch (e) { document.documentElement.classList.remove('light'); document.documentElement.classList.add('dark'); }` }} />
+        <script dangerouslySetInnerHTML={{ __html: `try { var t = localStorage.getItem('termos-ti:theme:v2'); var theme = t === 'dark' ? 'dark' : 'light'; document.documentElement.classList.remove('dark', 'light'); document.documentElement.classList.add(theme); document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f8fafc' : '#0a0708'); } catch (e) { document.documentElement.classList.remove('dark'); document.documentElement.classList.add('light'); }` }} />
       </head>
       <body className="font-sans antialiased">
         <AppShell>{children}</AppShell>
