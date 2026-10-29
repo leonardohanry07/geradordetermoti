@@ -11,8 +11,8 @@ export default function LoginPage() {
           <img src={LOGO_GAVIOES_PNG} alt="Academia Gaviões" width={180} height={105} className="h-[76px] w-[130px] object-contain" />
         </div>
         <div className="rounded-2xl border border-[#d9e0ea] bg-white px-8 py-8 shadow-[0_1px_2px_rgba(15,23,42,0.02)] sm:px-8 sm:py-9">
-          <h1 className="text-center font-sans text-[25px] font-semibold tracking-[-0.03em] text-[#050b20]">Faça login na sua conta</h1>
-          <p className="mt-2 text-center text-[16px] text-[#425b86]">Insira as suas credenciais para aceder à sua conta</p>
+          <h1 className="text-center font-sans text-[25px] font-semibold tracking-[-0.03em] text-[#050b20]">Entrar na sua conta</h1>
+          <p className="mt-2 text-center text-[16px] text-[#425b86]">Informe suas credenciais para acessar o sistema.</p>
           <div className="mt-6"><LoginForm /></div>
         </div>
       </section>
