@@ -25,6 +25,6 @@ async function loadProfile(): Promise<CurrentProfile | null> {
 }
 
 export function useProfile() {
-  const { data, isLoading } = useSWR("current-profile", loadProfile, { revalidateOnFocus: false })
+  const { data, isLoading } = useSWR("me-profile", loadProfile, { revalidateOnFocus: false })
   return { profile: data ?? null, isAdmin: data?.role === "admin", loading: isLoading }
 }

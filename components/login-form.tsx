@@ -1,18 +1,25 @@
 "use client"
 
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import Link from "next/link"
-import { LockKeyhole, Mail } from "lucide-react"
+import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { rememberedChecked, rememberedEmail, setRemember } from "@/lib/remember"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [remember, setRemember] = useState(false)
+  const [remember, setRememberChecked] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setEmail(rememberedEmail())
+    setRememberChecked(rememberedChecked())
+  }, [])
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -20,7 +27,10 @@ export function LoginForm() {
     setError("")
     const { error: authError } = await createClient().auth.signInWithPassword({ email, password })
     if (authError) setError("E-mail ou senha incorretos.")
-    else router.push("/")
+    else {
+      setRemember(remember, email)
+      router.push("/")
+    }
     setLoading(false)
   }
 
@@ -40,11 +50,12 @@ export function LoginForm() {
         </div>
         <span className="relative block">
           <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 size-[19px] -translate-y-1/2 text-[#9aa8bc]" aria-hidden="true" />
-          <input id="password" required type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" className="h-9 w-full rounded-md border border-[#cbd3df] bg-white pl-10 pr-3 text-sm text-[#172d50] shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none placeholder:text-[#7282a0] focus:border-[#f04444] focus:ring-2 focus:ring-[#f04444]/15" />
+          <input id="password" required type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" className="h-9 w-full rounded-md border border-[#cbd3df] bg-white pl-10 pr-10 text-sm text-[#172d50] shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none placeholder:text-[#7282a0] focus:border-[#f04444] focus:ring-2 focus:ring-[#f04444]/15" />
+          <button type="button" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} aria-pressed={showPassword} onClick={() => setShowPassword((value) => !value)} className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-1 text-[#71829e] hover:text-[#172d50]">{showPassword ? <EyeOff className="size-4" aria-hidden="true" /> : <Eye className="size-4" aria-hidden="true" />}</button>
         </span>
       </div>
       <label className="mt-0.5 flex items-center gap-2 text-[14px] text-[#18345f]">
-        <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} className="size-4 rounded border-[#cbd3df] accent-[#f04444]" />
+        <input type="checkbox" checked={remember} onChange={(event) => setRememberChecked(event.target.checked)} className="size-4 rounded border-[#cbd3df] accent-[#f04444]" />
         Lembrar de mim
       </label>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
