@@ -3,19 +3,15 @@ import { Fragment, useState } from "react"
 import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
 import { Section } from "./termo-form"
-import { ChevronDown, ChevronRight, Users } from "lucide-react"
+import { Ban, ChevronDown, ChevronRight, FilePlus, Pencil, ShieldCheck, Trash2, Users } from "lucide-react"
 
 type Profile = { id: string; nome: string | null; email: string | null; role: "admin" | "user"; ativo: boolean; created_at: string }
 type Atividade = { id: string; user_id: string | null; acao: string; detalhe: string | null; em: string }
 type Data = { me: string; items: Profile[]; atividades: Atividade[] }
 
-const ACOES: Record<string, string> = {
-  criou_termo: "Gerou termo",
-  moveu_termo: "Moveu no quadro",
-  editou_observacao: "Editou observação",
-  excluiu_termo: "Excluiu termo",
-  alterou_configuracoes: "Alterou configurações",
-}
+const ACOES: Record<string, string> = { criou_termo: "Gerou termo", excluiu_termo: "Excluiu termo", adicionou_clausula: "Adicionou cláusula", editou_clausula: "Editou cláusula", removeu_clausula: "Removeu cláusula", adicionou_assinatura: "Adicionou assinatura", editou_assinatura: "Editou assinatura", removeu_assinatura: "Removeu assinatura", alterou_perfil: "Alterou perfil de usuário", bloqueou_usuario: "Bloqueou usuário", liberou_usuario: "Liberou usuário" }
+const ACTION_ICONS: Record<string, typeof FilePlus> = { criou_termo: FilePlus, excluiu_termo: Trash2, adicionou_clausula: FilePlus, editou_clausula: Pencil, removeu_clausula: Trash2, adicionou_assinatura: FilePlus, editou_assinatura: Pencil, removeu_assinatura: Trash2, alterou_perfil: ShieldCheck, bloqueou_usuario: Ban, liberou_usuario: ShieldCheck }
+const destructiveActions = new Set(["excluiu_termo", "removeu_clausula", "removeu_assinatura", "bloqueou_usuario"])
 
 const fmt = (iso: string) => new Date(iso).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })
 
@@ -57,7 +53,7 @@ export function UsersAdmin() {
           </thead>
           <tbody>
             {data.items.map((item) => {
-              const mine = data.atividades.filter((a) => a.user_id === item.id)
+              const mine = data.atividades.filter((a) => a.user_id === item.id && ACOES[a.acao])
               const isOpen = open === item.id
               const self = item.id === data.me
               return (
@@ -96,7 +92,7 @@ export function UsersAdmin() {
                             {mine.slice(0, 50).map((a) => (
                               <li key={a.id} className="flex flex-wrap gap-x-3">
                                 <span className="w-28 shrink-0 text-xs text-muted-foreground">{fmt(a.em)}</span>
-                                <span className="font-medium">{ACOES[a.acao] ?? a.acao}</span>
+                                {(() => { const Icon = ACTION_ICONS[a.acao] ?? ShieldCheck; return <Icon className={`size-4 shrink-0 ${destructiveActions.has(a.acao) ? "text-destructive" : "text-muted-foreground"}`} aria-hidden="true" /> })()}<span className={`font-medium ${destructiveActions.has(a.acao) ? "text-destructive" : ""}`}>{ACOES[a.acao]}</span>
                                 {a.detalhe && <span className="text-muted-foreground">{a.detalhe}</span>}
                               </li>
                             ))}
@@ -111,7 +107,7 @@ export function UsersAdmin() {
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">O registro de ações começa a partir de hoje. Contas só são criadas com e-mail @academiagavioes24h.com.br ou @academiagavioes.com.br.</p>
+      <p className="mt-3 text-xs text-muted-foreground">Registramos apenas ações críticas: geração e exclusão de termos, mudanças em cláusulas e assinaturas e alterações de permissão. Contas só são criadas com e-mail @academiagavioes24h.com.br ou @academiagavioes.com.br.</p>
     </Section>
   )
 }
