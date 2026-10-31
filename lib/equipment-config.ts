@@ -29,7 +29,7 @@ export const EQUIPMENT_TYPES: EquipmentType[] = [
     id: "notebook",
     label: "Notebook",
     nomeNoTermo: "notebook",
-    specificField: { key: "serie", label: "Número de série", placeholder: "Ex: 5CD1234ABC" },
+    specificField: { key: "serie", label: "Número de série / identificação", placeholder: "Ex: 5CD1234ABC" },
   },
   {
     id: "carregador",

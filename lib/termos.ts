@@ -6,7 +6,7 @@ export type Clause = { id: string; title: string; text?: string; bullets?: strin
 export type TermoData = {
   company: { razaoSocial: string; cnpj: string; nomeMarca: string; unidadeRazaoSocial: string; unidadeCnpj: string }
   colaborador: { nome: string; cpf: string; data: string }
-  equipamento: { tipo: string; marca: string; modelo: string; specificValue: string; acessorios: string; outroNome?: string }
+  equipamento: { tipo: string; marca: string; modelo: string; specificValue: string; serie?: string; acessorios: string; outroNome?: string }
   signers: { label: string; nome: string }[]
   clauses: Clause[]
 }
@@ -58,13 +58,13 @@ export function getTermoResponsabilidade(data: TermoData): Block[] {
 export function getTermoRecebimento(data: TermoData): Block[] {
   const nomeEquip = getEquipmentName(data.equipamento)
   const type = getEquipmentType(data.equipamento.tipo)
-  const campoLabel = type?.specificField.label ?? "Identificador"
+  const campoLabel = type?.specificField.key === "serie" ? "Número de série / identificação" : type?.specificField.label ?? "Identificador"
   const nome = data.colaborador.nome || "________________"
   return [
     { type: "title", text: `TERMO DE RECEBIMENTO DE ${nomeEquip.toUpperCase()}` }, { type: "spacer", size: 3 },
     { type: "paragraph", text: `Eu, ${nome}, Declaro que recebi, em bom estado de conservação e funcionamento, o ${nomeEquip} abaixo descrito, entregue pela empresa ${data.company.nomeMarca}.` },
     { type: "spacer", size: 2 }, { type: "heading", text: "Informações do Equipamento:" },
-    { type: "bullet", text: `Modelo: ${data.equipamento.modelo || ""}` }, { type: "bullet", text: `Marca: ${data.equipamento.marca || ""}` }, { type: "bullet", text: `${campoLabel}: ${data.equipamento.specificValue || ""}` }, { type: "bullet", text: `Acessórios (se houver): ${data.equipamento.acessorios || ""}` },
+    { type: "bullet", text: `Modelo: ${data.equipamento.modelo || ""}` }, { type: "bullet", text: `Marca: ${data.equipamento.marca || ""}` }, { type: "bullet", text: `${campoLabel}: ${data.equipamento.specificValue || ""}` }, ...(type?.specificField.key !== "serie" && data.equipamento.serie?.trim() ? [{ type: "bullet" as const, text: `Número de série / identificação: ${data.equipamento.serie.trim()}` }] : []), { type: "bullet", text: `Acessórios (se houver): ${data.equipamento.acessorios || ""}` },
     { type: "spacer", size: 2 }, { type: "paragraph", text: `Este ${nomeEquip} será de minha responsabilidade a partir da data de recebimento.` }, { type: "spacer", size: 2 },
     { type: "paragraph", text: `Unidade: ${data.company.unidadeRazaoSocial}` }, { type: "paragraph", text: `CNPJ: ${data.company.unidadeCnpj}` }, { type: "paragraph", text: `Data: ${data.colaborador.data}` }, { type: "spacer", size: 2 }, { type: "paragraph", text: "Assinatura do Recebedor:" },
   ]
