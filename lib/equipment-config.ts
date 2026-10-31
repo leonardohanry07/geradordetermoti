@@ -23,39 +23,39 @@ export const EQUIPMENT_TYPES: EquipmentType[] = [
     id: "celular",
     label: "Celular",
     nomeNoTermo: "celular",
-    specificField: { key: "identificacao", label: "Número de série / identificação", placeholder: "Ex.: número de série ou patrimônio" },
+    specificField: { key: "identificacao", label: "Número de série / identificação" },
   },
   {
     id: "notebook",
     label: "Notebook",
     nomeNoTermo: "notebook",
-    specificField: { key: "identificacao", label: "Número de série / identificação", placeholder: "Ex.: número de série ou patrimônio" },
+    specificField: { key: "identificacao", label: "Número de série / identificação" },
   },
   {
     id: "carregador",
     label: "Carregador / Adaptador AC",
     nomeNoTermo: "adaptador AC",
-    specificField: { key: "identificacao", label: "Número de série / identificação", placeholder: "Ex.: número de série ou patrimônio" },
+    specificField: { key: "identificacao", label: "Número de série / identificação" },
   },
   {
     id: "teclado",
     label: "Teclado",
     nomeNoTermo: "teclado",
-    specificField: { key: "identificacao", label: "Número de série / identificação", placeholder: "Ex.: número de série ou patrimônio" },
+    specificField: { key: "identificacao", label: "Número de série / identificação" },
   },
   {
     id: "mouse",
     label: "Mouse",
     nomeNoTermo: "mouse",
-    specificField: { key: "identificacao", label: "Número de série / identificação", placeholder: "Ex.: número de série ou patrimônio" },
+    specificField: { key: "identificacao", label: "Número de série / identificação" },
   },
   {
     id: "monitor",
     label: "Monitor",
     nomeNoTermo: "monitor",
-    specificField: { key: "identificacao", label: "Número de série / identificação", placeholder: "Ex.: número de série ou patrimônio" },
+    specificField: { key: "identificacao", label: "Número de série / identificação" },
   },
-  { id: "outros", label: "Outros", nomeNoTermo: "equipamento", specificField: { key: "identificacao", label: "Número de série / identificação", placeholder: "Ex.: número de série ou patrimônio" } },
+  { id: "outros", label: "Outros", nomeNoTermo: "equipamento", specificField: { key: "identificacao", label: "Número de série / identificação" } },
 ]
 
 export const OUTROS_ID = "outros"
